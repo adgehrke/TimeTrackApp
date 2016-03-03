@@ -13,6 +13,7 @@ public class Timetrack extends Application {
     private long time = 0;
     private long startTime = 0;
     private boolean started = false;
+    private int hourlyRate = 40;
 
     public Timetrack(){
         System.out.println("Gestartet");
@@ -25,7 +26,7 @@ public class Timetrack extends Application {
                         if (started){
                             Calendar c = Calendar.getInstance();
                             long time = System.currentTimeMillis();
-                            stopwatchSecs = Math.round(time - startTime)/1000;
+                            stopwatchSecs = Math.round(time - startTime)/10;
 
                             System.out.println("Gestartet"+stopwatchSecs);
                         }
@@ -38,6 +39,14 @@ public class Timetrack extends Application {
         };
 
         t.start();
+    }
+
+    public int getHourlyRate(){
+        return hourlyRate;
+    }
+
+    public void setHourlyRate(int hourlyRate){
+        this.hourlyRate = hourlyRate;
     }
 
     public boolean getEnabled(){

@@ -31,6 +31,7 @@ public class StopwatchActivity extends AppCompatActivity
     TimerTask timerTask;
     TextView tv1;
     TextView tv2;
+    TextView earnedMoney;
     Timetrack app;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +60,7 @@ public class StopwatchActivity extends AppCompatActivity
         app = (Timetrack) getApplicationContext();
         this.tv1 = (TextView)findViewById(R.id.timeTxt);
         this.tv2 = (TextView)findViewById(R.id.startTime);
+        this.earnedMoney = (TextView)findViewById(R.id.earnedMoneyTxt);
         tv1.setText("00");
         Thread t = new Thread() {
 
@@ -71,11 +73,30 @@ public class StopwatchActivity extends AppCompatActivity
                             @Override
                             public void run() {
                                 app = (Timetrack) getApplicationContext();
-                                int stopWatchSecs = app.getStopWatchSecs();
-                                tv1.setText(String.format("%02d", stopWatchSecs));
+                                int stopWatchVal = app.getStopWatchSecs();
+                                int stopWatchSecs = 0;
+                                int stopWatchMinutes = 0;
+                                int stopWatchHours = 0;
+
+                                if (stopWatchVal > 3600){
+                                    stopWatchHours = stopWatchVal/3600;
+                                    stopWatchMinutes = (stopWatchVal-3600*stopWatchHours)/60;
+                                    stopWatchSecs = stopWatchVal%60;
+                                }
+                                else if (stopWatchVal > 60){
+                                    stopWatchMinutes = stopWatchVal/60;
+                                    stopWatchSecs = stopWatchVal%60;
+                                }
+                                else{
+                                    stopWatchSecs = stopWatchVal%60;
+                                }
+                                tv1.setText(String.format("%02d", stopWatchHours)+":"+String.format("%02d", stopWatchMinutes)+":"+String.format("%02d", stopWatchSecs));
+
+                                double earnedMoneyVal = (Math.round(stopWatchVal / 60.0 / 60.0 * app.getHourlyRate()*100.0) / 100.0);
+                                earnedMoney.setText(String.format("%1$,.2f", earnedMoneyVal)+" €");
                             }
                         });
-                        Thread.sleep(1000);
+                            Thread.sleep(1000);
                     }
                 } catch (InterruptedException e) {
                 }

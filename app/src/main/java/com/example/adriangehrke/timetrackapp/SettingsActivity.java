@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.Calendar;
@@ -30,6 +31,7 @@ public class SettingsActivity extends AppCompatActivity
     TimerTask timerTask;
     TextView tv1;
     TextView tv2;
+    Timetrack app;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +39,7 @@ public class SettingsActivity extends AppCompatActivity
         setContentView(R.layout.activity_settings);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        app = (Timetrack) getApplicationContext();
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,6 +59,13 @@ public class SettingsActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
 
+    }
+
+    /** Called when the user touches the button */
+    public void saveSettings(View view) {
+        EditText hourlyRateValue = (EditText)findViewById(R.id.hourlyRateTxt);
+        int hourlyRate = Integer.valueOf(hourlyRateValue.getText().toString().trim());
+        app.setHourlyRate(hourlyRate);
     }
 
 
