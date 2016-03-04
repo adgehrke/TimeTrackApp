@@ -26,7 +26,7 @@ public class Timetrack extends Application {
                         if (started){
                             Calendar c = Calendar.getInstance();
                             long time = System.currentTimeMillis();
-                            stopwatchSecs = Math.round(time - startTime)/10;
+                            stopwatchSecs = Math.round(time - startTime)/1000;
 
                             System.out.println("Gestartet"+stopwatchSecs);
                         }
