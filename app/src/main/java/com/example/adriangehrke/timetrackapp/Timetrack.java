@@ -1,7 +1,9 @@
 package com.example.adriangehrke.timetrackapp;
 
 import android.app.Application;
-import android.view.View;
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 
 import java.util.Calendar;
 
@@ -15,7 +17,13 @@ public class Timetrack extends Application {
     private boolean started = false;
     private int hourlyRate = 40;
 
+
+
+
     public Timetrack(){
+
+
+
         System.out.println("Gestartet");
         Thread t = new Thread() {
 
@@ -39,7 +47,10 @@ public class Timetrack extends Application {
         };
 
         t.start();
+
     }
+
+
 
     public int getHourlyRate(){
         return hourlyRate;
@@ -83,4 +94,21 @@ public class Timetrack extends Application {
         Calendar c = Calendar.getInstance();
         startTime = System.currentTimeMillis();
     }
+
+    public void createTables(SQLiteDatabase db){
+        db.execSQL(Clients.SQL_CREATE_ENTRIES);
+        db.execSQL(Worksessions.SQL_CREATE_ENTRIES);
+    }
+
+    public void addWorksession(SQLiteDatabase db, int clientId, int duration){
+        ContentValues values = new ContentValues();
+        values.put(Worksessions.WorksessionsEntry.COLUMN_NAME_CLIENT, clientId);
+        values.put(Worksessions.WorksessionsEntry.COLUMN_NAME_DURATION, duration);
+
+        long newRowId;
+        newRowId = db.insert(Worksessions.WorksessionsEntry.TABLE_NAME,"y",values);
+    }
+
+
+
 }

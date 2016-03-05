@@ -2,6 +2,8 @@ package com.example.adriangehrke.timetrackapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -14,8 +16,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -26,6 +31,8 @@ public class StopwatchActivity extends AppCompatActivity
     private long time = 0;
     private long startTime = 0;
     private boolean started = false;
+    DbHelper mDbHelper;
+    SQLiteDatabase db;
 
     Timer timer;
     TimerTask timerTask;
@@ -39,6 +46,46 @@ public class StopwatchActivity extends AppCompatActivity
         setContentView(R.layout.activity_stopwatch);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        mDbHelper = new DbHelper(this);
+        db = mDbHelper.getWritableDatabase();
+
+        String[] projection = {
+                Clients.ClientEntry._ID,
+                Clients.ClientEntry.COLUMN_NAME_TITLE,
+        };
+
+// How you want the results sorted in the resulting Cursor
+        String sortOrder =
+                Clients.ClientEntry._ID + " DESC";
+
+        ArrayList<String> values = new ArrayList<String>();
+        int a = 0;
+        try (Cursor c = db.query(
+                Clients.ClientEntry.TABLE_NAME,  // The table to query
+                projection,                               // The columns to return
+                null,                                // The columns for the WHERE clause
+                null,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                sortOrder                                 // The sort order
+        )) {
+            while (c.moveToNext()) {
+                values.add(c.getString(c.getColumnIndex(Clients.ClientEntry.COLUMN_NAME_TITLE)));
+                a++;
+            }
+        }
+
+// Create an ArrayAdapter using the string array and a default spinner layout
+        // Creating adapter for spinner
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, values);
+
+        // Drop down layout style - list view with radio button
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // attaching data adapter to spinner
+        spinner.setAdapter(dataAdapter);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -109,6 +156,7 @@ public class StopwatchActivity extends AppCompatActivity
     /** Called when the user touches the button */
     public void stopTimer(View view) {
         app.setStarted(false);
+        app.addWorksession(db, 1, 100);
 
     }
 

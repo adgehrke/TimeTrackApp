@@ -1,8 +1,13 @@
 package com.example.adriangehrke.timetrackapp;
 
+import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.view.View;
@@ -18,12 +23,15 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static java.security.AccessController.getContext;
 
 public class DashboardActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -32,10 +40,15 @@ public class DashboardActivity extends AppCompatActivity
     private long startTime = 0;
     private boolean started = false;
 
+    private int n=0;
+
     Timer timer;
     TimerTask timerTask;
     TextView stopwatchStatusTxt;
     Timetrack app;
+
+    DbHelper mDbHelper;
+    SQLiteDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +56,9 @@ public class DashboardActivity extends AppCompatActivity
         setContentView(R.layout.activity_dashboard);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        initDatabase();
+
         this.stopwatchStatusTxt = (TextView)findViewById(R.id.StopwatchStatusTxt);
         app = (Timetrack) getApplicationContext();
         String status = "not running";
@@ -70,16 +86,98 @@ public class DashboardActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        Timetrack s = new Timetrack();
 
+
+
+
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        app.createTables(db);
+    }
+
+
+
+    private void initDatabase(){
+        mDbHelper = new DbHelper(this);
+        db = mDbHelper.getWritableDatabase();
+
+
+
+// Create a new map of values, where column names are the keys
+
+        /*Context context = getApplicationContext();
+        CharSequence text = username+" "+password;
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();*/
+    }
+
+    public void fillBtn(View view){
+        db.execSQL(FeedReaderContract.SQL_CREATE_ENTRIES);
+        ContentValues values = new ContentValues();
+        values.put(FeedReaderContract.FeedEntry.COLUMN_NAME_TITLE, "aaa"+n);
+        n++;
+
+// Insert the new row, returning the primary key value of the new row
+        long newRowId;
+        newRowId = db.insert(
+                FeedReaderContract.FeedEntry.TABLE_NAME,
+                "y",
+                values);
+    }
+
+    public void readBtn(View view){
+        String[] projection = {
+                FeedReaderContract.FeedEntry._ID,
+                FeedReaderContract.FeedEntry.COLUMN_NAME_TITLE,
+        };
+
+// How you want the results sorted in the resulting Cursor
+        String sortOrder =
+                FeedReaderContract.FeedEntry._ID + " DESC";
+
+        ArrayList<String> values = new ArrayList<String>();
+        int a = 0;
+        try (Cursor c = db.query(
+                FeedReaderContract.FeedEntry.TABLE_NAME,  // The table to query
+                projection,                               // The columns to return
+                null,                                // The columns for the WHERE clause
+                null,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                sortOrder                                 // The sort order
+        )) {
+            while (c.moveToNext()) {
+                values.add(c.getString(c.getColumnIndex(FeedReaderContract.FeedEntry.COLUMN_NAME_TITLE)));
+                a++;
+            }
+        }
+
+
+
+
+
+         Context context = getApplicationContext();
+        CharSequence text = values.get(values.size()-1);
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
 
         final ListView listview = (ListView) findViewById(R.id.listview);
-        String[] values = new String[] { "Stiehl/Over Gmbh", "Urologie Göttingen", "HNO Göttingen" };
+
 
         final ArrayList<String> list = new ArrayList<String>();
-        for (int i = 0; i < values.length; ++i) {
-            list.add(values[i]);
-        }
+
+            for (int i = 0; i < values.size(); ++i) {
+                list.add(values.get(i));
+            }
+
         final StableArrayAdapter adapter = new StableArrayAdapter(this,android.R.layout.simple_list_item_1, list);
         listview.setAdapter(adapter);
 
@@ -100,7 +198,6 @@ public class DashboardActivity extends AppCompatActivity
             }
 
         });
-
     }
 
     private class StableArrayAdapter extends ArrayAdapter<String> {
@@ -171,6 +268,12 @@ public class DashboardActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_gallery) {
             Intent intent = new Intent(this, StopwatchActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            startActivityForResult(intent, 1);
+            // Handle the camera action
+        }
+        else if (id == R.id.nav_clients) {
+            Intent intent = new Intent(this, ClientsActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             startActivityForResult(intent, 1);
             // Handle the camera action

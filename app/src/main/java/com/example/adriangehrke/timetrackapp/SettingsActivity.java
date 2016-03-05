@@ -1,5 +1,7 @@
 package com.example.adriangehrke.timetrackapp;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -15,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Calendar;
 import java.util.Timer;
@@ -66,7 +69,15 @@ public class SettingsActivity extends AppCompatActivity
         EditText hourlyRateValue = (EditText)findViewById(R.id.hourlyRateTxt);
         int hourlyRate = Integer.valueOf(hourlyRateValue.getText().toString().trim());
         app.setHourlyRate(hourlyRate);
+
+        Context context = getApplicationContext();
+        CharSequence text = getString(R.string.settings_saved);
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
     }
+
 
 
     @Override

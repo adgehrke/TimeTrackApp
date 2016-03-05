@@ -34,8 +34,30 @@
         android:layout_alignParentEnd="true" />
     <ListView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/listview"
+        android:layout_marginTop="100dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:layout_below="@+id/stopwatchStatusDescTxt" />
+        android:layout_alignParentLeft="true" />
+
+
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Read DB"
+        android:onClick="readBtn"
+        android:id="@+id/readBtn"
+        android:layout_below="@+id/stopwatchStatusDescTxt"
+        android:layout_toLeftOf="@+id/StopwatchStatusTxt"
+        android:layout_toStartOf="@+id/StopwatchStatusTxt" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Fill DB"
+        android:onClick="fillBtn"
+        android:id="@+id/button"
+        android:layout_below="@+id/stopwatchStatusDescTxt"
+        android:layout_toLeftOf="@+id/readBtn"
+        android:layout_toStartOf="@+id/readBtn" />
 </RelativeLayout>
