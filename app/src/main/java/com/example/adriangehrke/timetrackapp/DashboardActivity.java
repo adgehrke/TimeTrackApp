@@ -162,7 +162,7 @@ public class DashboardActivity extends AppCompatActivity
 
 
 
-         Context context = getApplicationContext();
+        Context context = getApplicationContext();
         CharSequence text = values.get(values.size()-1);
         int duration = Toast.LENGTH_SHORT;
 
@@ -174,9 +174,9 @@ public class DashboardActivity extends AppCompatActivity
 
         final ArrayList<String> list = new ArrayList<String>();
 
-            for (int i = 0; i < values.size(); ++i) {
-                list.add(values.get(i));
-            }
+        for (int i = 0; i < values.size(); ++i) {
+            list.add(values.get(i));
+        }
 
         final StableArrayAdapter adapter = new StableArrayAdapter(this,android.R.layout.simple_list_item_1, list);
         listview.setAdapter(adapter);
@@ -263,26 +263,22 @@ public class DashboardActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        Intent intent = new Intent(this, StopwatchActivity.class);
 
-        if (id == R.id.nav_camera) {
-
-        } else if (id == R.id.nav_gallery) {
-            Intent intent = new Intent(this, StopwatchActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-            startActivityForResult(intent, 1);
-            // Handle the camera action
+        if (id == R.id.nav_dashboard) {
+            intent = new Intent(this, DashboardActivity.class);
+        } else if (id == R.id.nav_stopwatch) {
+            intent = new Intent(this, StopwatchActivity.class);
         }
-        else if (id == R.id.nav_clients) {
-            Intent intent = new Intent(this, ClientsActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-            startActivityForResult(intent, 1);
-            // Handle the camera action
+        else if (id == R.id.nav_projects) {
+            intent = new Intent(this, ClientsActivity.class);
         }
         else if (id == R.id.nav_settings) {
-            Intent intent = new Intent(this, SettingsActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-            startActivityForResult(intent, 1);
+            intent = new Intent(this, SettingsActivity.class);
         }
+
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivityForResult(intent, 1);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;

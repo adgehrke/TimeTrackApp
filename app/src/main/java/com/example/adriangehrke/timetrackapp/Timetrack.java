@@ -3,8 +3,12 @@ package com.example.adriangehrke.timetrackapp;
 import android.app.Application;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.widget.ListView;
+import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 /**
@@ -36,7 +40,7 @@ public class Timetrack extends Application {
                             long time = System.currentTimeMillis();
                             stopwatchSecs = Math.round(time - startTime)/1000;
 
-                            System.out.println("Gestartet"+stopwatchSecs);
+                            //System.out.println("Gestartet"+stopwatchSecs);
                         }
 
                         Thread.sleep(1000);
@@ -107,6 +111,34 @@ public class Timetrack extends Application {
 
         long newRowId;
         newRowId = db.insert(Worksessions.WorksessionsEntry.TABLE_NAME,"y",values);
+    }
+
+    public ArrayList<Client> getClients(SQLiteDatabase db){
+        String[] projection = {
+                Clients.ClientEntry._ID,
+                Clients.ClientEntry.COLUMN_NAME_TITLE,
+        };
+
+        String sortOrder = Clients.ClientEntry._ID + " DESC";
+
+        ArrayList<Client> clients = new ArrayList<Client>();
+        try (Cursor c = db.query(
+                Clients.ClientEntry.TABLE_NAME,  // The table to query
+                projection,                               // The columns to return
+                null,                                // The columns for the WHERE clause
+                null,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                sortOrder                                 // The sort order
+        )) {
+            while (c.moveToNext()) {
+                clients.add(new Client(c.getPosition(),c.getString(c.getColumnIndex(Clients.ClientEntry.COLUMN_NAME_TITLE))));
+            }
+        }
+
+
+       return clients;
+
     }
 
 

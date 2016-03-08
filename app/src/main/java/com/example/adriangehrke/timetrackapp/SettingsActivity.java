@@ -117,18 +117,22 @@ public class SettingsActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        Intent intent = new Intent(this, StopwatchActivity.class);
 
-        if (id == R.id.nav_camera) {
-            Intent intent = new Intent(this, StopwatchActivity.class);
-            startActivityForResult(intent, 1);
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
+        if (id == R.id.nav_dashboard) {
+            intent = new Intent(this, DashboardActivity.class);
+        } else if (id == R.id.nav_stopwatch) {
+            intent = new Intent(this, StopwatchActivity.class);
+        }
+        else if (id == R.id.nav_projects) {
+            intent = new Intent(this, ClientsActivity.class);
         }
         else if (id == R.id.nav_settings) {
-            Intent intent = new Intent(this, SettingsActivity.class);
-            startActivityForResult(intent, 1);
+            intent = new Intent(this, SettingsActivity.class);
         }
+
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivityForResult(intent, 1);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;

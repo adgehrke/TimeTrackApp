@@ -18,7 +18,7 @@ public final class Clients {
 
     public static final String TEXT_TYPE = " TEXT";
     public static final String COMMA_SEP = ",";
-    public static final String Worksessions =
+    public static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE IF NOT EXISTS " + ClientEntry.TABLE_NAME + " (" +
                     ClientEntry._ID + " INTEGER PRIMARY KEY," +
                     ClientEntry.COLUMN_NAME_TITLE + TEXT_TYPE +
