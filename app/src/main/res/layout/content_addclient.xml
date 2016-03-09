@@ -9,13 +9,13 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".AddclientActivity"
-    tools:showIn="@layout/app_bar_addclient">
+    tools:context=".activities.AddprojectActivity"
+    tools:showIn="@layout/activity_addclient">
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Fill DB"
+        android:text="Create Project"
         android:id="@+id/fillDb"
         android:onClick="addClient"
         android:layout_alignParentBottom="true"
@@ -28,9 +28,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/clientsAddName"
         android:ems="10"
+        android:layout_marginTop="76dp"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="87dp"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 
     <EditText
@@ -39,9 +38,45 @@
         android:inputType="number"
         android:ems="10"
         android:id="@+id/clientsAddHourlyRate"
-        android:layout_centerVertical="true"
-        android:layout_alignRight="@+id/clientsAddName"
-        android:layout_alignEnd="@+id/clientsAddName" />
+        android:layout_below="@+id/clientsAddName"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="62dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Project Name"
+        android:id="@+id/textView9"
+        android:layout_alignTop="@+id/clientsAddName"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Hourly Rate"
+        android:id="@+id/textView10"
+        android:layout_alignTop="@+id/clientsAddHourlyRate"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="in €"
+        android:id="@+id/textView11"
+        android:layout_alignBottom="@+id/clientsAddHourlyRate"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Name of the Project"
+        android:id="@+id/textView12"
+        android:layout_below="@+id/textView9"
+        android:layout_alignParentStart="true" />
 
 
 </RelativeLayout>

@@ -9,8 +9,8 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".DashboardActivity"
-    tools:showIn="@layout/app_bar_dashboard">
+    tools:context=".activities.DashboardActivity"
+    tools:showIn="@layout/activity_dashboard">
 
 
     <TextView
@@ -41,23 +41,12 @@
 
 
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Read DB"
-        android:onClick="readBtn"
-        android:id="@+id/readBtn"
-        android:layout_below="@+id/stopwatchStatusDescTxt"
-        android:layout_toLeftOf="@+id/StopwatchStatusTxt"
-        android:layout_toStartOf="@+id/StopwatchStatusTxt" />
 
-    <Button
+
+    <ListView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/worksessions"
+        android:layout_marginTop="50dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Fill DB"
-        android:onClick="fillBtn"
-        android:id="@+id/button"
-        android:layout_below="@+id/stopwatchStatusDescTxt"
-        android:layout_toLeftOf="@+id/readBtn"
-        android:layout_toStartOf="@+id/readBtn" />
+        android:layout_alignParentLeft="true" />
 </RelativeLayout>

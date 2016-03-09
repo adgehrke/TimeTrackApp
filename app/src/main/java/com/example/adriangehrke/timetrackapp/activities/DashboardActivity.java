@@ -1,15 +1,11 @@
-package com.example.adriangehrke.timetrackapp;
+package com.example.adriangehrke.timetrackapp.activities;
 
-import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.provider.BaseColumns;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -22,16 +18,22 @@ import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.adriangehrke.timetrackapp.StableArrayAdapter;
+import com.example.adriangehrke.timetrackapp.database.DbHelper;
+import com.example.adriangehrke.timetrackapp.R;
+import com.example.adriangehrke.timetrackapp.Timetrack;
+import com.example.adriangehrke.timetrackapp.models.Project;
+import com.example.adriangehrke.timetrackapp.models.Worksession;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import static java.security.AccessController.getContext;
 
 public class DashboardActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -49,6 +51,8 @@ public class DashboardActivity extends AppCompatActivity
 
     DbHelper mDbHelper;
     SQLiteDatabase db;
+
+    Spinner mySpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,14 +72,7 @@ public class DashboardActivity extends AppCompatActivity
         }
 
         this.stopwatchStatusTxt.setText(status);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -91,13 +88,72 @@ public class DashboardActivity extends AppCompatActivity
 
 
 
+
+
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         app.createTables(db);
+        TextView usernameTxt;
+        TextView usermailTxt;
+        usernameTxt = (TextView)findViewById(R.id.username);
+        usermailTxt = (TextView)findViewById(R.id.usermail);
+
+        ArrayList<Worksession> worksessions = mDbHelper.getWorksessionList(db);
+        if (worksessions.size() > 0){
+            Context context = getApplicationContext();
+
+            final ListView listview = (ListView) findViewById(R.id.worksessions);
+
+
+            final ArrayList<String> list = new ArrayList<String>();
+
+            for (int i = 0; i < worksessions.size(); ++i) {
+
+                list.add(getProjectById(worksessions.get(i).getProjectId()).getName()+" "+worksessions.get(i).getDuration());
+            }
+
+            final com.example.adriangehrke.timetrackapp.StableArrayAdapter adapter = new com.example.adriangehrke.timetrackapp.StableArrayAdapter(this,android.R.layout.simple_list_item_1, list);
+            listview.setAdapter(adapter);
+
+            listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                @Override
+                public void onItemClick(AdapterView<?> parent, final View view,
+                                        int position, long id) {
+                    final String item = (String) parent.getItemAtPosition(position);
+                    view.animate().setDuration(2000).alpha(0).withEndAction(new Runnable() {
+                        @Override
+                        public void run() {
+                            list.remove(item);
+                            adapter.notifyDataSetChanged();
+                            view.setAlpha(1);
+                        }
+                    });
+                }
+
+            });
+
+        }
+        else{
+
+        }
+
     }
+
+    private Project getProjectById(int id){
+        ArrayList<Project> projects = mDbHelper.getProjectList(db);
+        for(Project project : projects){
+            if (project.getId() == id){
+                return project;
+            }
+        }
+        return null;
+    }
+
+
 
 
 
@@ -117,88 +173,7 @@ public class DashboardActivity extends AppCompatActivity
         toast.show();*/
     }
 
-    public void fillBtn(View view){
-        db.execSQL(FeedReaderContract.SQL_CREATE_ENTRIES);
-        ContentValues values = new ContentValues();
-        values.put(FeedReaderContract.FeedEntry.COLUMN_NAME_TITLE, "aaa"+n);
-        n++;
 
-// Insert the new row, returning the primary key value of the new row
-        long newRowId;
-        newRowId = db.insert(
-                FeedReaderContract.FeedEntry.TABLE_NAME,
-                "y",
-                values);
-    }
-
-    public void readBtn(View view){
-        String[] projection = {
-                FeedReaderContract.FeedEntry._ID,
-                FeedReaderContract.FeedEntry.COLUMN_NAME_TITLE,
-        };
-
-// How you want the results sorted in the resulting Cursor
-        String sortOrder =
-                FeedReaderContract.FeedEntry._ID + " DESC";
-
-        ArrayList<String> values = new ArrayList<String>();
-        int a = 0;
-        try (Cursor c = db.query(
-                FeedReaderContract.FeedEntry.TABLE_NAME,  // The table to query
-                projection,                               // The columns to return
-                null,                                // The columns for the WHERE clause
-                null,                            // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                sortOrder                                 // The sort order
-        )) {
-            while (c.moveToNext()) {
-                values.add(c.getString(c.getColumnIndex(FeedReaderContract.FeedEntry.COLUMN_NAME_TITLE)));
-                a++;
-            }
-        }
-
-
-
-
-
-        Context context = getApplicationContext();
-        CharSequence text = values.get(values.size()-1);
-        int duration = Toast.LENGTH_SHORT;
-
-        Toast toast = Toast.makeText(context, text, duration);
-        toast.show();
-
-        final ListView listview = (ListView) findViewById(R.id.listview);
-
-
-        final ArrayList<String> list = new ArrayList<String>();
-
-        for (int i = 0; i < values.size(); ++i) {
-            list.add(values.get(i));
-        }
-
-        final StableArrayAdapter adapter = new StableArrayAdapter(this,android.R.layout.simple_list_item_1, list);
-        listview.setAdapter(adapter);
-
-        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, final View view,
-                                    int position, long id) {
-                final String item = (String) parent.getItemAtPosition(position);
-                view.animate().setDuration(2000).alpha(0).withEndAction(new Runnable() {
-                    @Override
-                    public void run() {
-                        list.remove(item);
-                        adapter.notifyDataSetChanged();
-                        view.setAlpha(1);
-                    }
-                });
-            }
-
-        });
-    }
 
     private class StableArrayAdapter extends ArrayAdapter<String> {
 
@@ -271,7 +246,7 @@ public class DashboardActivity extends AppCompatActivity
             intent = new Intent(this, StopwatchActivity.class);
         }
         else if (id == R.id.nav_projects) {
-            intent = new Intent(this, ClientsActivity.class);
+            intent = new Intent(this, ProjectActivity.class);
         }
         else if (id == R.id.nav_settings) {
             intent = new Intent(this, SettingsActivity.class);

@@ -1,4 +1,4 @@
-package com.example.adriangehrke.timetrackapp;
+package com.example.adriangehrke.timetrackapp.activities;
 
 import android.app.Activity;
 import android.content.ContentValues;
@@ -9,7 +9,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -20,10 +19,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.adriangehrke.timetrackapp.StableArrayAdapter;
+import com.example.adriangehrke.timetrackapp.database.DbHelper;
+import com.example.adriangehrke.timetrackapp.database.Projects;
+import com.example.adriangehrke.timetrackapp.R;
+import com.example.adriangehrke.timetrackapp.Timetrack;
+import com.example.adriangehrke.timetrackapp.models.Project;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,12 +37,15 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class AddclientActivity extends AppCompatActivity
+public class ProjectActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private long time = 0;
     private long startTime = 0;
     private boolean started = false;
+
+    ProgressBar mProgress;
+    private int mProgressStatus = 0;
 
     Timer timer;
     TimerTask timerTask;
@@ -50,7 +59,7 @@ public class AddclientActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_addclient);
+        setContentView(R.layout.activity_clients);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         app = (Timetrack) getApplicationContext();
@@ -58,8 +67,7 @@ public class AddclientActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                addActivity();
             }
         });
 
@@ -74,136 +82,97 @@ public class AddclientActivity extends AppCompatActivity
 
         mDbHelper = new DbHelper(this);
         db = mDbHelper.getWritableDatabase();
+        updateList();
     }
 
-    public void addClient(View view){
-        EditText hourlyRateValue = (EditText)findViewById(R.id.clientsAddHourlyRate);
-        int hourlyRate = Integer.valueOf(hourlyRateValue.getText().toString().trim());
+    private void addActivity(){
+        Intent a = new Intent(this, AddprojectActivity.class);
 
-        EditText nameValue = (EditText)findViewById(R.id.clientsAddName);
-        String name = nameValue.getText().toString().trim();
-
-        ContentValues values = new ContentValues();
-        values.put(Clients.ClientEntry.COLUMN_NAME_TITLE, name);
-
-
-// Insert the new row, returning the primary key value of the new row
-        long newRowId;
-        newRowId = db.insert(
-                Clients.ClientEntry.TABLE_NAME,
-                "y",
-                values);
-        Intent returnIntent = new Intent();
-        setResult(Activity.RESULT_OK, returnIntent);
-        finish();
+        startActivityForResult(a, 1);
+        overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
     }
 
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == 1) {
+            if(resultCode == Activity.RESULT_OK){
+                String result=data.getStringExtra("result");
+                updateList();
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                //Write your code if there's no result
+            }
+        }
+    }//onActivityResult
 
     public void fillBtn(View view){
-        db.execSQL(Clients.SQL_CREATE_ENTRIES);
+
+        db.execSQL(Projects.SQL_CREATE_ENTRIES);
         ContentValues values = new ContentValues();
-        values.put(Clients.ClientEntry.COLUMN_NAME_TITLE, "aaa");
+        values.put(Projects.ProjectEntry.COLUMN_NAME_NAME, "aaa");
 
 
 // Insert the new row, returning the primary key value of the new row
         long newRowId;
         newRowId = db.insert(
-                Clients.ClientEntry.TABLE_NAME,
+                Projects.ProjectEntry.TABLE_NAME,
                 "y",
                 values);
     }
 
     public void readBtn(View view) {
-        String[] projection = {
-                Clients.ClientEntry._ID,
-                Clients.ClientEntry.COLUMN_NAME_TITLE,
-        };
-
-// How you want the results sorted in the resulting Cursor
-        String sortOrder =
-                Clients.ClientEntry._ID + " DESC";
-
-        ArrayList<String> values = new ArrayList<String>();
-        int a = 0;
-        try (Cursor c = db.query(
-                Clients.ClientEntry.TABLE_NAME,  // The table to query
-                projection,                               // The columns to return
-                null,                                // The columns for the WHERE clause
-                null,                            // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                sortOrder                                 // The sort order
-        )) {
-            while (c.moveToNext()) {
-                values.add(c.getString(c.getColumnIndex(Clients.ClientEntry.COLUMN_NAME_TITLE)));
-                a++;
-            }
-        }
-
-
-        Context context = getApplicationContext();
-        CharSequence text = values.get(values.size()-1);
-        int duration = Toast.LENGTH_SHORT;
-
-        Toast toast = Toast.makeText(context, text, duration);
-        toast.show();
-
-        final ListView listview = (ListView) findViewById(R.id.listview);
-
-
-        final ArrayList<String> list = new ArrayList<String>();
-
-        for (int i = 0; i < values.size(); ++i) {
-            list.add(values.get(i));
-        }
-
-        final StableArrayAdapter adapter = new StableArrayAdapter(this,android.R.layout.simple_list_item_1, list);
-        listview.setAdapter(adapter);
-
-        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, final View view,
-                                    int position, long id) {
-                final String item = (String) parent.getItemAtPosition(position);
-                view.animate().setDuration(2000).alpha(0).withEndAction(new Runnable() {
-                    @Override
-                    public void run() {
-                        list.remove(item);
-                        adapter.notifyDataSetChanged();
-                        view.setAlpha(1);
-                    }
-                });
-            }
-
-        });
+        updateList();
     }
 
-    private class StableArrayAdapter extends ArrayAdapter<String> {
+    private void updateList(){
+        ArrayList<Project> values = mDbHelper.getProjectList(db);
+        if (values.size() > 0){
+            Context context = getApplicationContext();
+            CharSequence text = values.get(values.size()-1).getName();
+            int duration = Toast.LENGTH_SHORT;
 
-        HashMap<String, Integer> mIdMap = new HashMap<String, Integer>();
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
 
-        public StableArrayAdapter(Context context, int textViewResourceId,
-                                  List<String> objects) {
-            super(context, textViewResourceId, objects);
-            for (int i = 0; i < objects.size(); ++i) {
-                mIdMap.put(objects.get(i), i);
+            final ListView listview = (ListView) findViewById(R.id.listview);
+
+
+            final ArrayList<String> list = new ArrayList<String>();
+
+            for (int i = 0; i < values.size(); ++i) {
+                list.add(values.get(i).getName());
             }
-        }
 
-        @Override
-        public long getItemId(int position) {
-            String item = getItem(position);
-            return mIdMap.get(item);
-        }
+            final StableArrayAdapter adapter = new StableArrayAdapter(this,android.R.layout.simple_list_item_1, list);
+            listview.setAdapter(adapter);
 
-        @Override
-        public boolean hasStableIds() {
-            return true;
-        }
+            listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
+                @Override
+                public void onItemClick(AdapterView<?> parent, final View view,
+                                        int position, long id) {
+                    final String item = (String) parent.getItemAtPosition(position);
+                    view.animate().setDuration(2000).alpha(0).withEndAction(new Runnable() {
+                        @Override
+                        public void run() {
+                            list.remove(item);
+                            adapter.notifyDataSetChanged();
+                            view.setAlpha(1);
+                        }
+                    });
+                }
+
+            });
+
+        }
+        else{
+
+        }
     }
+
+
 
 
     @Override
@@ -214,7 +183,6 @@ public class AddclientActivity extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
-        overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
     }
 
     @Override
@@ -252,7 +220,7 @@ public class AddclientActivity extends AppCompatActivity
             intent = new Intent(this, StopwatchActivity.class);
         }
         else if (id == R.id.nav_projects) {
-            intent = new Intent(this, ClientsActivity.class);
+            intent = new Intent(this, ProjectActivity.class);
         }
         else if (id == R.id.nav_settings) {
             intent = new Intent(this, SettingsActivity.class);

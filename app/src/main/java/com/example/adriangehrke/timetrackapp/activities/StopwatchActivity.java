@@ -1,4 +1,4 @@
-package com.example.adriangehrke.timetrackapp;
+package com.example.adriangehrke.timetrackapp.activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -16,12 +16,21 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.adriangehrke.timetrackapp.database.DbHelper;
+import com.example.adriangehrke.timetrackapp.database.Projects;
+import com.example.adriangehrke.timetrackapp.R;
+import com.example.adriangehrke.timetrackapp.Timetrack;
+import com.example.adriangehrke.timetrackapp.models.Project;
+import com.example.adriangehrke.timetrackapp.models.Worksession;
+
+import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -33,6 +42,8 @@ public class StopwatchActivity extends AppCompatActivity
     private boolean started = false;
     DbHelper mDbHelper;
     SQLiteDatabase db;
+    public int position=1;
+    Spinner mySpinner;
 
     Timer timer;
     TimerTask timerTask;
@@ -52,18 +63,18 @@ public class StopwatchActivity extends AppCompatActivity
         db = mDbHelper.getWritableDatabase();
 
         String[] projection = {
-                Clients.ClientEntry._ID,
-                Clients.ClientEntry.COLUMN_NAME_TITLE,
+                Projects.ProjectEntry.COLUMN_NAME_ID,
+                Projects.ProjectEntry.COLUMN_NAME_NAME,
         };
 
 // How you want the results sorted in the resulting Cursor
         String sortOrder =
-                Clients.ClientEntry._ID + " DESC";
+                Projects.ProjectEntry.COLUMN_NAME_ID + " DESC";
 
         ArrayList<String> values = new ArrayList<String>();
         int a = 0;
         try (Cursor c = db.query(
-                Clients.ClientEntry.TABLE_NAME,  // The table to query
+                Projects.ProjectEntry.TABLE_NAME,  // The table to query
                 projection,                               // The columns to return
                 null,                                // The columns for the WHERE clause
                 null,                            // The values for the WHERE clause
@@ -72,7 +83,7 @@ public class StopwatchActivity extends AppCompatActivity
                 sortOrder                                 // The sort order
         )) {
             while (c.moveToNext()) {
-                values.add(c.getString(c.getColumnIndex(Clients.ClientEntry.COLUMN_NAME_TITLE)));
+                values.add(c.getString(c.getColumnIndex(Projects.ProjectEntry.COLUMN_NAME_NAME)));
                 a++;
             }
         }
@@ -87,14 +98,7 @@ public class StopwatchActivity extends AppCompatActivity
         // attaching data adapter to spinner
         spinner.setAdapter(dataAdapter);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -151,12 +155,25 @@ public class StopwatchActivity extends AppCompatActivity
         };
 
         t.start();
+
+        mySpinner=(Spinner) findViewById(R.id.spinner);
+
+        mySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+
+                ArrayList<Project> projects = mDbHelper.getProjectList(db);
+                position = projects.get(pos).getId();
+            }
+
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
     }
 
     /** Called when the user touches the button */
     public void stopTimer(View view) {
         app.setStarted(false);
-        app.addWorksession(db, 1, 100);
+        mDbHelper.addWorksession(db, position, app.getStopWatchSecs());
 
     }
 
@@ -211,7 +228,7 @@ public class StopwatchActivity extends AppCompatActivity
             intent = new Intent(this, StopwatchActivity.class);
         }
         else if (id == R.id.nav_projects) {
-            intent = new Intent(this, ClientsActivity.class);
+            intent = new Intent(this, ProjectActivity.class);
         }
         else if (id == R.id.nav_settings) {
             intent = new Intent(this, SettingsActivity.class);

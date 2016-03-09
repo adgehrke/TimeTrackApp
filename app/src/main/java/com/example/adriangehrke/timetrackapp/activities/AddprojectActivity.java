@@ -1,4 +1,4 @@
-package com.example.adriangehrke.timetrackapp;
+package com.example.adriangehrke.timetrackapp.activities;
 
 import android.app.Activity;
 import android.content.ContentValues;
@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -19,9 +20,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.adriangehrke.timetrackapp.database.DbHelper;
+import com.example.adriangehrke.timetrackapp.database.Projects;
+import com.example.adriangehrke.timetrackapp.R;
+import com.example.adriangehrke.timetrackapp.Timetrack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,7 +36,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class ClientsActivity extends AppCompatActivity
+public class AddprojectActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private long time = 0;
@@ -48,17 +55,11 @@ public class ClientsActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_clients);
+        setContentView(R.layout.activity_addclient);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         app = (Timetrack) getApplicationContext();
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                addActivity();
-            }
-        });
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -73,60 +74,56 @@ public class ClientsActivity extends AppCompatActivity
         db = mDbHelper.getWritableDatabase();
     }
 
-    private void addActivity(){
-        Intent a = new Intent(this, AddclientActivity.class);
+    public void addClient(View view){
+        EditText hourlyRateValue = (EditText)findViewById(R.id.clientsAddHourlyRate);
+        int hourlyRate = Integer.valueOf(hourlyRateValue.getText().toString().trim());
 
-        startActivityForResult(a, 1);
-        overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
-    }
+        EditText nameValue = (EditText)findViewById(R.id.clientsAddName);
+        String name = nameValue.getText().toString().trim();
 
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        if (requestCode == 1) {
-            if(resultCode == Activity.RESULT_OK){
-                String result=data.getStringExtra("result");
-                updateList();
-            }
-            if (resultCode == Activity.RESULT_CANCELED) {
-                //Write your code if there's no result
-            }
-        }
-    }//onActivityResult
-
-    public void fillBtn(View view){
-        db.execSQL(Clients.SQL_CREATE_ENTRIES);
         ContentValues values = new ContentValues();
-        values.put(Clients.ClientEntry.COLUMN_NAME_TITLE, "aaa");
+        values.put(Projects.ProjectEntry.COLUMN_NAME_NAME, name);
 
 
 // Insert the new row, returning the primary key value of the new row
         long newRowId;
         newRowId = db.insert(
-                Clients.ClientEntry.TABLE_NAME,
+                Projects.ProjectEntry.TABLE_NAME,
                 "y",
                 values);
+        Intent returnIntent = new Intent();
+        setResult(Activity.RESULT_OK, returnIntent);
+        finish();
+    }
+
+
+
+    public void fillBtn(View view){
+        db.execSQL(Projects.SQL_DELETE_ENTRIES);
+        db.execSQL(Projects.SQL_CREATE_ENTRIES);
+        ContentValues values = new ContentValues();
+        values.put(Projects.ProjectEntry.COLUMN_NAME_NAME, "aaa");
+
+
+// Insert the new row, returning the primary key value of the new row
+        long newRowId;
+        newRowId = db.insert(Projects.ProjectEntry.TABLE_NAME,"y",values);
     }
 
     public void readBtn(View view) {
-        updateList();
-    }
-
-    private void updateList(){
         String[] projection = {
-                Clients.ClientEntry._ID,
-                Clients.ClientEntry.COLUMN_NAME_TITLE,
+                Projects.ProjectEntry._ID,
+                Projects.ProjectEntry.COLUMN_NAME_NAME,
         };
 
 // How you want the results sorted in the resulting Cursor
         String sortOrder =
-                Clients.ClientEntry._ID + " DESC";
+                Projects.ProjectEntry._ID + " DESC";
 
         ArrayList<String> values = new ArrayList<String>();
         int a = 0;
         try (Cursor c = db.query(
-                Clients.ClientEntry.TABLE_NAME,  // The table to query
+                Projects.ProjectEntry.TABLE_NAME,  // The table to query
                 projection,                               // The columns to return
                 null,                                // The columns for the WHERE clause
                 null,                            // The values for the WHERE clause
@@ -135,7 +132,7 @@ public class ClientsActivity extends AppCompatActivity
                 sortOrder                                 // The sort order
         )) {
             while (c.moveToNext()) {
-                values.add(c.getString(c.getColumnIndex(Clients.ClientEntry.COLUMN_NAME_TITLE)));
+                values.add(c.getString(c.getColumnIndex(Projects.ProjectEntry.COLUMN_NAME_NAME)));
                 a++;
             }
         }
@@ -213,6 +210,7 @@ public class ClientsActivity extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
+        overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
     }
 
     @Override
@@ -250,7 +248,7 @@ public class ClientsActivity extends AppCompatActivity
             intent = new Intent(this, StopwatchActivity.class);
         }
         else if (id == R.id.nav_projects) {
-            intent = new Intent(this, ClientsActivity.class);
+            intent = new Intent(this, ProjectActivity.class);
         }
         else if (id == R.id.nav_settings) {
             intent = new Intent(this, SettingsActivity.class);

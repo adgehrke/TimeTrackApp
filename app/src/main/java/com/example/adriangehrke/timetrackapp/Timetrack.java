@@ -2,11 +2,12 @@ package com.example.adriangehrke.timetrackapp;
 
 import android.app.Application;
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.widget.ListView;
-import android.widget.Toast;
+
+import com.example.adriangehrke.timetrackapp.database.Projects;
+import com.example.adriangehrke.timetrackapp.models.Project;
+import com.example.adriangehrke.timetrackapp.database.Worksessions;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -100,30 +101,23 @@ public class Timetrack extends Application {
     }
 
     public void createTables(SQLiteDatabase db){
-        db.execSQL(Clients.SQL_CREATE_ENTRIES);
+        db.execSQL(Projects.SQL_CREATE_ENTRIES);
         db.execSQL(Worksessions.SQL_CREATE_ENTRIES);
     }
 
-    public void addWorksession(SQLiteDatabase db, int clientId, int duration){
-        ContentValues values = new ContentValues();
-        values.put(Worksessions.WorksessionsEntry.COLUMN_NAME_CLIENT, clientId);
-        values.put(Worksessions.WorksessionsEntry.COLUMN_NAME_DURATION, duration);
 
-        long newRowId;
-        newRowId = db.insert(Worksessions.WorksessionsEntry.TABLE_NAME,"y",values);
-    }
 
-    public ArrayList<Client> getClients(SQLiteDatabase db){
+    public ArrayList<Project> getClients(SQLiteDatabase db){
         String[] projection = {
-                Clients.ClientEntry._ID,
-                Clients.ClientEntry.COLUMN_NAME_TITLE,
+                Projects.ProjectEntry._ID,
+                Projects.ProjectEntry.COLUMN_NAME_NAME,
         };
 
-        String sortOrder = Clients.ClientEntry._ID + " DESC";
+        String sortOrder = Projects.ProjectEntry._ID + " DESC";
 
-        ArrayList<Client> clients = new ArrayList<Client>();
+        ArrayList<Project> projects = new ArrayList<Project>();
         try (Cursor c = db.query(
-                Clients.ClientEntry.TABLE_NAME,  // The table to query
+                Projects.ProjectEntry.TABLE_NAME,  // The table to query
                 projection,                               // The columns to return
                 null,                                // The columns for the WHERE clause
                 null,                            // The values for the WHERE clause
@@ -132,12 +126,12 @@ public class Timetrack extends Application {
                 sortOrder                                 // The sort order
         )) {
             while (c.moveToNext()) {
-                clients.add(new Client(c.getPosition(),c.getString(c.getColumnIndex(Clients.ClientEntry.COLUMN_NAME_TITLE))));
+                projects.add(new Project(c.getPosition(),c.getString(c.getColumnIndex(Projects.ProjectEntry.COLUMN_NAME_NAME))));
             }
         }
 
 
-       return clients;
+       return projects;
 
     }
 

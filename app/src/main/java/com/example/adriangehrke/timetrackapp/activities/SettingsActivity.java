@@ -1,6 +1,5 @@
-package com.example.adriangehrke.timetrackapp;
+package com.example.adriangehrke.timetrackapp.activities;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,7 +18,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.Calendar;
+import com.example.adriangehrke.timetrackapp.R;
+import com.example.adriangehrke.timetrackapp.Timetrack;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -125,7 +126,7 @@ public class SettingsActivity extends AppCompatActivity
             intent = new Intent(this, StopwatchActivity.class);
         }
         else if (id == R.id.nav_projects) {
-            intent = new Intent(this, ClientsActivity.class);
+            intent = new Intent(this, ProjectActivity.class);
         }
         else if (id == R.id.nav_settings) {
             intent = new Intent(this, SettingsActivity.class);
