@@ -32,13 +32,25 @@
         </activity>
         <activity
             android:name=".activities.ProjectActivity"
-            android:label="@string/title_activity_clients"
+            android:label="@string/title_activity_projects"
             android:theme="@style/AppTheme.NoActionBar">
 
         </activity>
         <activity
             android:name=".activities.AddprojectActivity"
-            android:label="@string/title_activity_clients"
+            android:label="@string/title_activity_addproject"
+            android:theme="@style/AppTheme.NoActionBar">
+
+        </activity>
+        <activity
+            android:name=".activities.AnalyzeActivity"
+            android:label="@string/title_activity_analyze"
+            android:theme="@style/AppTheme.NoActionBar">
+
+        </activity>
+        <activity
+            android:name=".activities.ShowProjectActivity"
+            android:label="Show Project"
             android:theme="@style/AppTheme.NoActionBar">
 
         </activity>

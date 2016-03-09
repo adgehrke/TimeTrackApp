@@ -52,6 +52,8 @@ import java.util.ArrayList;
         String sortOrder = Projects.ProjectEntry.COLUMN_NAME_ID + " DESC";
 
         ArrayList<String> values = new ArrayList<String>();
+
+
         try (Cursor c = db.query(Projects.ProjectEntry.TABLE_NAME,projection,null, null, null, null, sortOrder)) {
             while (c.moveToNext()) {
                 Project tmpProject = new Project();
@@ -83,6 +85,45 @@ import java.util.ArrayList;
 
         ArrayList<String> values = new ArrayList<String>();
         try (Cursor c = db.query(Worksessions.WorksessionsEntry.TABLE_NAME,projection,null, null, null, null, sortOrder)) {
+            while (c.moveToNext()) {
+                Worksession tmpWorksession = new Worksession();
+                tmpWorksession.setId(c.getInt(c.getColumnIndex(Worksessions.WorksessionsEntry.COLUMN_NAME_ID)));
+                tmpWorksession.setProjectId(c.getInt(c.getColumnIndex(Worksessions.WorksessionsEntry.COLUMN_NAME_PROJECT)));
+                tmpWorksession.setDuration(c.getInt(c.getColumnIndex(Worksessions.WorksessionsEntry.COLUMN_NAME_DURATION)));
+
+                worksessions.add(tmpWorksession);
+            }
+        }
+
+
+        return worksessions;
+    }
+
+
+    public ArrayList<Worksession> getWorksessionsByProjectId(SQLiteDatabase db, int id){
+
+
+        ArrayList<Worksession> worksessions = new ArrayList<Worksession>();
+
+
+        String[] projection = {
+                Worksessions.WorksessionsEntry.COLUMN_NAME_DURATION,
+                Worksessions.WorksessionsEntry.COLUMN_NAME_PROJECT,
+                Worksessions.WorksessionsEntry.COLUMN_NAME_ID,
+
+
+        };
+
+        String whereClause = Projects.ProjectEntry.COLUMN_NAME_ID + "=?";
+        String[] whereArgs = new String[] {
+                id+""
+        };
+        String sortOrder = Worksessions.WorksessionsEntry.COLUMN_NAME_ID + " DESC";
+
+        ArrayList<String> values = new ArrayList<String>();
+
+
+        try (Cursor c = db.query(Worksessions.WorksessionsEntry.TABLE_NAME,projection,whereClause, whereArgs, null, null, sortOrder)) {
             while (c.moveToNext()) {
                 Worksession tmpWorksession = new Worksession();
                 tmpWorksession.setId(c.getInt(c.getColumnIndex(Worksessions.WorksessionsEntry.COLUMN_NAME_ID)));

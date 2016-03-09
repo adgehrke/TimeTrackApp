@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/TimeTrackAppGit.iml" filepath="$PROJECT_DIR$/TimeTrackAppGit.iml" />
+      <module fileurl="file://$PROJECT_DIR$/TimeTrackApp.iml" filepath="$PROJECT_DIR$/TimeTrackApp.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

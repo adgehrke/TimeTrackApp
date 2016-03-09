@@ -115,7 +115,7 @@ public class DashboardActivity extends AppCompatActivity
                 list.add(getProjectById(worksessions.get(i).getProjectId()).getName()+" "+worksessions.get(i).getDuration());
             }
 
-            final com.example.adriangehrke.timetrackapp.StableArrayAdapter adapter = new com.example.adriangehrke.timetrackapp.StableArrayAdapter(this,android.R.layout.simple_list_item_1, list);
+            final StableArrayAdapter adapter = new StableArrayAdapter(this,android.R.layout.simple_list_item_1, list);
             listview.setAdapter(adapter);
 
             listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -244,6 +244,9 @@ public class DashboardActivity extends AppCompatActivity
             intent = new Intent(this, DashboardActivity.class);
         } else if (id == R.id.nav_stopwatch) {
             intent = new Intent(this, StopwatchActivity.class);
+        }
+        else if (id == R.id.nav_analyze) {
+            intent = new Intent(this, AnalyzeActivity.class);
         }
         else if (id == R.id.nav_projects) {
             intent = new Intent(this, ProjectActivity.class);
